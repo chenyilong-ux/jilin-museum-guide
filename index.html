@@ -62,49 +62,6 @@
   .hero h2 em{font-style:normal;color:var(--red)}
   .hero p{max-width:660px;margin:0 auto;color:var(--ink-soft);font-size:15px}
 
-  /* NFC 演示 */
-  .nfc-demo{
-    max-width:1080px;margin:0 auto;padding:10px 20px 8px;
-  }
-  .nfc-card{
-    background:linear-gradient(135deg,#fffdf7,#f4ead8);
-    border:1px solid var(--line);border-radius:22px;padding:26px;
-    box-shadow:var(--shadow);
-  }
-  .nfc-card h3{font-family:"Songti SC",serif;font-size:19px;margin-bottom:4px}
-  .nfc-card .sub{font-size:13px;color:var(--ink-soft);margin-bottom:20px}
-  .tap-zone{
-    display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:center;
-    margin-bottom:20px;
-  }
-  .tag{
-    width:150px;height:150px;border-radius:50%;flex:none;
-    background:radial-gradient(circle at 35% 30%,#f7ead2,#e7d3a8 55%,#c9a96a);
-    border:3px solid var(--gold);box-shadow:inset 0 0 0 8px rgba(255,255,255,.35), 0 8px 22px rgba(139,111,71,.35);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    cursor:pointer;transition:.25s;color:var(--ink);
-  }
-  .tag:hover{transform:scale(1.05);box-shadow:0 12px 30px rgba(139,111,71,.5)}
-  .tag:active{transform:scale(.96)}
-  .tag .icon{font-size:34px;line-height:1}
-  .tag .lab{font-size:11px;margin-top:6px;letter-spacing:1px;color:#5a4638;font-weight:600}
-  .ripple{
-    position:relative;overflow:hidden;
-  }
-  .pulse{animation:pulse 2s infinite}
-  @keyframes pulse{
-    0%{box-shadow:0 0 0 0 rgba(201,169,106,.55), inset 0 0 0 8px rgba(255,255,255,.35)}
-    70%{box-shadow:0 0 0 24px rgba(201,169,106,0), inset 0 0 0 8px rgba(255,255,255,.35)}
-    100%{box-shadow:0 0 0 0 rgba(201,169,106,0), inset 0 0 0 8px rgba(255,255,255,.35)}
-  }
-  .url-line{
-    background:#3B2F2F;color:#e8d5a8;border-radius:12px;padding:14px 16px;
-    font-family:"SF Mono",Consolas,monospace;font-size:13px;text-align:center;
-    word-break:break-all;margin-bottom:14px;
-  }
-  .url-line b{color:#fff;font-weight:600}
-  .hint{font-size:12px;color:var(--ink-soft);text-align:center}
-
   /* 展品网格 */
   .exhibits{max-width:1080px;margin:0 auto;padding:26px 20px}
   .sec-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:8px}
@@ -173,17 +130,40 @@
     text-align:center;padding:34px 20px;color:var(--ink-soft);font-size:12px;
     border-top:1px solid var(--line);margin-top:10px;
   }
-  .nfc-note{
-    max-width:1080px;margin:0 auto;padding:0 20px 10px;
+  /* 数据条 */
+  .stats{
+    max-width:1080px;margin:0 auto;padding:0 20px 8px;
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;
   }
-  .nfc-note details{
-    background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;
+  .stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 12px;text-align:center}
+  .stat b{display:block;font-family:"Songti SC",serif;font-size:25px;color:var(--red);line-height:1.25}
+  .stat span{font-size:12px;color:var(--ink-soft)}
+
+  /* 通用板块 */
+  .block{max-width:1080px;margin:0 auto;padding:26px 20px 6px}
+  .block h3{font-family:"Songti SC",serif;font-size:22px;margin-bottom:4px}
+  .block .lead{color:var(--ink-soft);font-size:14px;margin-bottom:16px}
+  .prose p{font-size:15px;margin-bottom:12px;text-align:justify}
+  .prose .quote{
+    border-left:3px solid var(--gold);background:#faf5ea;border-radius:0 10px 10px 0;
+    padding:12px 16px;color:var(--ink-soft);font-size:14px;margin-top:4px;
   }
-  .nfc-note summary{cursor:pointer;font-weight:600;font-family:"Songti SC",serif;font-size:16px}
-  .nfc-note .steps{margin-top:14px;font-size:14px}
-  .nfc-note .steps ol{margin-left:20px}
-  .nfc-note .steps li{margin:8px 0}
-  .nfc-note code{background:#f4ead8;padding:2px 7px;border-radius:6px;font-size:13px;color:var(--red-deep)}
+
+  /* 常设展览 */
+  .exh-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .exh{background:#fff;border:1px solid var(--line);border-top:3px solid var(--red);border-radius:16px;padding:16px 18px}
+  .exh h4{font-family:"Songti SC",serif;font-size:17px;margin-bottom:6px}
+  .exh p{font-size:13px;color:var(--ink-soft);line-height:1.65}
+  .exh .tag{display:inline-block;margin-top:10px;font-size:11px;color:var(--bronze);border:1px solid var(--line);border-radius:12px;padding:2px 10px}
+
+  /* 参观信息 */
+  .visit{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px}
+  .visit dl{display:grid;grid-template-columns:76px 1fr;gap:10px 14px;font-size:14px;align-items:start}
+  .visit dt{color:var(--bronze);font-weight:600}
+  .visit dd{color:var(--ink)}
+  .tips{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+  .tips span{background:#f4ead8;color:#6b5230;font-size:12px;padding:6px 12px;border-radius:14px}
+  .footnote{font-size:12px;color:var(--ink-soft);margin-top:10px}
   .lang{display:flex;gap:6px;margin:12px 0 0}
   .lang button{border:1px solid var(--line);background:#fff;border-radius:14px;padding:4px 12px;font-size:12px;cursor:pointer}
   .lang button.active{background:var(--bronze);color:#fff;border-color:var(--bronze)}
@@ -213,13 +193,57 @@
   <p>无需下载 APP、无需租借讲解器。用手机轻触展品旁的 NFC 标签，即刻打开本页并自动播放对应文物的语音讲解。</p>
 </section>
 
-<section class="nfc-demo">
-  <div class="nfc-card">
-    <h3>📱 模拟 NFC 触碰</h3>
-    <p class="sub">点击下方标签，模拟手机「一碰」后打开对应展品讲解页（真实场景下为手机自动触发）</p>
-    <div class="tap-zone" id="tapZone"></div>
-    <div class="url-line">NFC 标签内写入的网址：<b id="urlPreview">https://your-domain.com/guide/?id=jilin-meteorite</b></div>
-    <p class="hint">原理：NFC 标签存的是一个网址（NDEF URI），手机读到网址后自动用浏览器打开本页并定位到对应展品。</p>
+<section class="stats">
+  <div class="stat"><b>3.9万</b><span>馆藏文物（件/套）</span></div>
+  <div class="stat"><b>21</b><span>国家一级文物</span></div>
+  <div class="stat"><b>1770kg</b><span>世界最大单体石陨石</span></div>
+  <div class="stat"><b>30万+</b><span>年服务观众人次</span></div>
+</section>
+
+<section class="block">
+  <h3>关于吉林市博物馆</h3>
+  <p class="lead">依松花江而建的城市博物馆，也是以陨石闻名于世的专题馆</p>
+  <div class="prose">
+    <p>吉林市博物馆（吉林市陨石博物馆）位于松花江南岸，前临世纪广场，是一座集陨石、历史、民俗与艺术于一体的综合性博物馆。馆藏文物 39381 件（套），其中一级文物 21 件、二级文物 28 件、三级文物 1218 件，年服务观众逾 30 万人次。</p>
+    <p>馆内的吉林陨石雨陈列，收藏着 1976 年 3 月 8 日陨落的陨石群。其中"吉林一号"重 1770 公斤，是世界上最大的单体石陨石，已载入吉尼斯世界纪录，被誉为"宇宙使者"，为天体起源、空间探测等研究提供了珍贵的实物资料。</p>
+    <div class="quote">"让收藏在博物馆里的文物、陈列在广阔大地上的遗产、书写在古籍里的文字都活起来。"</div>
+  </div>
+</section>
+
+<section class="block">
+  <h3>常设展览</h3>
+  <p class="lead">从史前遗迹到近代江城，一条相对完整的地方文脉</p>
+  <div class="exh-list">
+    <div class="exh">
+      <h4>吉林陨石雨陈列</h4>
+      <p>以世界最大单体石陨石"吉林一号"领衔，还原 1976 年那场陨石雨，展示陨石的成因、分类与科研价值。</p>
+      <span class="tag">镇馆之宝</span>
+    </div>
+    <div class="exh">
+      <h4>松江万古流 · 吉林市历史陈列</h4>
+      <p>从寿山仙人洞史前遗迹，到西团山文化、夫余古国、明清船厂，勾勒边疆与中原一脉相承的历史轨迹。</p>
+      <span class="tag">历史通史</span>
+    </div>
+    <div class="exh">
+      <h4>吉林市满族陈列</h4>
+      <p>服饰、刺绣与萨满祭祀遗存，呈现满族在松花江流域的生活图景与多元一体的文化脉络。</p>
+      <span class="tag">民族民俗</span>
+    </div>
+    <div class="exh">
+      <h4>明清船厂历史陈列</h4>
+      <p>吉林乌拉船厂与打牲乌拉总管衙门，讲述"船厂"如何一步步长成一座江城。</p>
+      <span class="tag">城市记忆</span>
+    </div>
+    <div class="exh">
+      <h4>孔子圣迹展</h4>
+      <p>以图文与实物讲述孔子生平，与吉林文庙共同构成江城传统文化的重要一脉。</p>
+      <span class="tag">传统文化</span>
+    </div>
+    <div class="exh">
+      <h4>松花湖浪木艺术</h4>
+      <p>江水冲刷千年的浪木根雕，化朽木为艺术，是吉林独有的地域文化符号。</p>
+      <span class="tag">地方艺术</span>
+    </div>
   </div>
 </section>
 
@@ -231,20 +255,25 @@
   <div class="grid" id="grid"></div>
 </section>
 
-<section class="nfc-note">
-  <details>
-    <summary>💡 如何实现「一碰就打开」？（技术说明）</summary>
-    <div class="steps">
-      <ol>
-        <li><b>准备 NFC 标签</b>：购买 NTAG213/215/216 无源标签（约 1–2 元/枚），容量足以写入一个网址。</li>
-        <li><b>写入网址</b>：用手机 App「NFC Tools」或读写器，向标签写入一条 <code>NDEF URI 记录</code>，例如 <code>https://your-domain.com/guide/?id=jilin-meteorite</code>。</li>
-        <li><b>部署网页</b>：把本页部署到服务器（如 GitHub Pages / Vercel / 腾讯云），每个展品对应一个 <code>?id=xxx</code> 参数。</li>
-        <li><b>贴到展柜</b>：将标签贴在文物说明牌旁（建议加铁氧体吸波材料抗金属干扰）。</li>
-        <li><b>游客一碰</b>：Android 手机原生支持，读到网址自动弹窗打开浏览器；iPhone XS 及以上支持「后台 NFC 读取」，无需开 App 即自动跳转。</li>
-      </ol>
-      <p style="margin-top:12px;font-size:13px;color:var(--ink-soft)">补充：如需更沉浸体验，可配合「App Clip（iOS）/ 小程序（微信）」；不支持的机型可用二维码兜底，本页 URL 即二维码内容。</p>
+<section class="block">
+  <h3>参观信息</h3>
+  <p class="lead">免费开放，凭有效证件实名登记入馆</p>
+  <div class="visit">
+    <dl>
+      <dt>地址</dt><dd>吉林省吉林市丰满区吉林大街 100 号（前临世纪广场，背靠江南公园）</dd>
+      <dt>开放</dt><dd>周二至周日 9:00—16:30（16:00 停止入馆），周一闭馆，国家法定节假日除外</dd>
+      <dt>门票</dt><dd>免费开放；参观陨石雨陈列建议提前在官方公众号预约，并提前 10 分钟到总服务台取票</dd>
+      <dt>交通</dt><dd>3 路、19 路、33 路、52 路、61 路、103 路、130 路至「世纪广场」站下车</dd>
+      <dt>建议</dt><dd>陨石陈列建议预留 40 分钟，全程参观约 2 小时</dd>
+    </dl>
+    <div class="tips">
+      <span>🎧 轻触展柜 NFC 标签即可收听讲解</span>
+      <span>♿ 支持大字与高对比度</span>
+      <span>🌏 中文 / English / 日本語 / 한국어</span>
+      <span>📷 允许拍照，请勿使用闪光灯</span>
     </div>
-  </details>
+  </div>
+  <p class="footnote">开放时间、预约方式与票务信息以馆方最新公告为准。</p>
 </section>
 
 <div class="modal" id="modal">
@@ -252,8 +281,8 @@
 </div>
 
 <footer>
-  文博智联 · 以 NFC 技术打开文博服务新空间 &nbsp;|&nbsp; 演示样例：吉林市博物馆<br>
-  本页为前端演示，语音讲解由浏览器 Web Speech API 合成，可无缝替换为后端 TTS/真人录音
+  吉林市博物馆 · 智慧导览 &nbsp;|&nbsp; 文博智联<br>
+  吉林省吉林市丰满区吉林大街 100 号 &nbsp;|&nbsp; 周二至周日 9:00—16:30
 </footer>
 
 <script>
@@ -307,6 +336,27 @@ const EXHIBITS = [
     zh:{name:'满族民俗与服饰', desc:'吉林地区是满族重要聚居地。吉林市满族陈列展出的服饰、刺绣与萨满文化遗存，展现了浓郁的民族风情与多元一体的文化脉络。'},
     en:{name:'Manchu Folk Culture & Costume', desc:'A major Manchu settlement area; costumes, embroidery and shamanic relics show rich ethnic heritage.'},
     facts:['满族重要聚居地','服饰刺绣工艺精湛','萨满文化遗存丰富']
+  },
+  {
+    id:'confucius-temple',
+    icon:'🏛️', era:'清乾隆元年（1736年）',
+    zh:{name:'吉林文庙·孔子圣迹', desc:'吉林文庙始建于清乾隆元年，是东北地区规模最大的文庙之一。孔子圣迹展以图文与实物讲述孔子生平，与文庙建筑共同构成江城的传统文化核心。'},
+    en:{name:'Jilin Confucian Temple', desc:'Founded in 1736, one of the largest Confucian temples in Northeast China. Its exhibition on Confucius complements the temple architecture.'},
+    facts:['始建于清乾隆元年（1736年）','东北规模最大的文庙之一','孔子圣迹展常年开放']
+  },
+  {
+    id:'driftwood-carving',
+    icon:'🌊', era:'当代',
+    zh:{name:'松花湖浪木根雕', desc:'浪木是松花湖中经江水长年冲刷、浸泡的枯木，质地坚韧、形态奇崛。艺人依形取势、因材施艺，化朽木为艺术，成为吉林独有的地域文化符号。'},
+    en:{name:'Songhua Lake Driftwood Carving', desc:'Driftwood long soaked and shaped by the river becomes tough, sculptural material. Artisans carve with the grain, turning dead wood into art.'},
+    facts:['松花湖特有的枯木资源','依形取势，因材施艺','吉林独有的地域文化符号']
+  },
+  {
+    id:'jingju-jilin',
+    icon:'🎭', era:'清末—民国',
+    zh:{name:'京剧"第二故乡"', desc:'清末吉林富商牛子厚出资创办"喜连成"科班，培养出梅兰芳、周信芳、马连良等一代宗师，吉林因此被誉为京剧的"第二故乡"。'},
+    en:{name:'Jilin: Peking Opera\'s Second Home', desc:'The Jilin merchant Niu Zihou funded the Xiliancheng opera school, training masters such as Mei Lanfang and Zhou Xinfang — earning Jilin the title of Peking Opera\'s second home.'},
+    facts:['牛子厚出资创办喜连成科班','走出梅兰芳、周信芳等名家','被誉为京剧"第二故乡"']
   }
 ];
 
@@ -362,17 +412,6 @@ function setDot(on){
 }
 
 // ===== 渲染 =====
-function renderTags(){
-  const zone = document.getElementById('tapZone');
-  zone.innerHTML = EXHIBITS.slice(0,5).map(e=>`
-    <div class="tag pulse" data-id="${e.id}" title="模拟触碰：${e.zh.name}">
-      <div class="icon">${e.icon}</div>
-      <div class="lab">${e.zh.name.replace(/吉林|文化|王国|古城|民俗|与服饰/g,'').slice(0,6)||'展品'}</div>
-    </div>`).join('');
-  zone.querySelectorAll('.tag').forEach(t=>{
-    t.addEventListener('click',()=>{ openExhibit(t.dataset.id); updateUrl(t.dataset.id); });
-  });
-}
 function renderGrid(){
   const grid = document.getElementById('grid');
   const L = LANG[curLang.v];
@@ -408,7 +447,10 @@ function thumbBg(id){
     'fuyu-bronze':'linear-gradient(135deg,#3f5a4a,#6f8f74)',
     'songhua-fishing':'linear-gradient(135deg,#2f5566,#5a8a9a)',
     'jilin-wula':'linear-gradient(135deg,#5a4638,#8a6f4a)',
-    'manchu-folk':'linear-gradient(135deg,#7a2f3a,#b05a68)'
+    'manchu-folk':'linear-gradient(135deg,#7a2f3a,#b05a68)',
+    'confucius-temple':'linear-gradient(135deg,#4a4a6a,#7d7d9e)',
+    'driftwood-carving':'linear-gradient(135deg,#5a4a32,#94795a)',
+    'jingju-jilin':'linear-gradient(135deg,#7a1f28,#c04a52)'
   };
   return map[id]||'linear-gradient(135deg,#5a4638,#8a6f4a)';
 }
@@ -446,10 +488,8 @@ function speakExhibit(id){
 function closeModal(){ stopSpeak(); document.getElementById('modal').classList.remove('show'); }
 document.getElementById('modal').addEventListener('click',e=>{ if(e.target.id==='modal') closeModal(); });
 
-// ===== URL 联动（体现 NFC 写入的网址）=====
+// ===== URL 联动（NFC 写入的网址定位到具体展品）=====
 function updateUrl(id){
-  const url = `${location.origin}${location.pathname}?id=${id}`;
-  document.getElementById('urlPreview').textContent = url;
   history.replaceState(null,'',`?id=${id}`);
 }
 
@@ -482,7 +522,6 @@ document.getElementById('a11yBtn').addEventListener('click',()=>{
 })();
 
 // ===== 初始化 =====
-renderTags();
 renderGrid();
 
 // 一碰进入：如果 URL 带 ?id=，直接打开对应展品并讲解

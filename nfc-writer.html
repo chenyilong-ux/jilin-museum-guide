@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFC 标签批量写入工具 · 吉林市博物馆</title>
+<style>
+  :root{
+    --bronze:#8B6F47; --gold:#C9A96A; --ink:#3B2F2F; --ink-soft:#6b5b53;
+    --cream:#F7F1E6; --paper:#FDFBF6; --red:#9E2B25; --green:#3f7d4a; --line:#E4D9C4;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--paper);color:var(--ink);line-height:1.7}
+  header{background:linear-gradient(135deg,#3B2F2F,#5a4638 60%,#7a5c3d);color:#f5ecdc;padding:20px;text-align:center}
+  header h1{font-family:"Songti SC",serif;font-size:22px;letter-spacing:1px}
+  header p{font-size:12px;color:#cbb995;margin-top:4px}
+  .wrap{max-width:680px;margin:0 auto;padding:20px}
+  .alert{border-radius:14px;padding:14px 16px;font-size:13px;margin-bottom:18px}
+  .alert.warn{background:#fdecea;border:1px solid #f5c6c0;color:#7c201c}
+  .alert.ok{background:#eaf5ec;border:1px solid #c4e0c8;color:#2f5a3a}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 4px 14px rgba(59,47,47,.05)}
+  .card h3{font-family:"Songti SC",serif;font-size:17px;margin-bottom:12px}
+  label{font-size:13px;color:var(--ink-soft);display:block;margin-bottom:6px}
+  input[type=text]{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:10px;font-size:14px;font-family:Consolas,monospace}
+  .list{display:flex;flex-direction:column;gap:10px}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border:1px solid var(--line);border-radius:12px}
+  .row .info{flex:1;min-width:0}
+  .row .name{font-size:14px;font-weight:600}
+  .row .url{font-size:11px;color:var(--ink-soft);word-break:break-all;font-family:Consolas,monospace}
+  .row .done{color:var(--green);font-size:20px;display:none}
+  .row.written{border-color:var(--green);background:#f3faf4}
+  .row.written .done{display:inline}
+  button{border:none;border-radius:10px;padding:10px 16px;font-size:14px;cursor:pointer;transition:.2s;white-space:nowrap}
+  .btn-write{background:var(--red);color:#fff}
+  .btn-write:hover{background:#7c201c}
+  .btn-batch{background:var(--bronze);color:#fff;width:100%;padding:14px;font-size:16px;border-radius:14px}
+  .btn-batch:hover{background:#6f5837}
+  .btn-batch:disabled{background:#c9bda8;cursor:not-allowed}
+  .status{background:#3B2F2F;color:#e8d5a8;border-radius:14px;padding:16px;font-size:14px;text-align:center;min-height:52px;margin-bottom:16px}
+  .status b{color:#fff}
+  .spinner{display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .note{font-size:12px;color:var(--ink-soft);margin-top:10px}
+</style>
+</head>
+<body>
+<header>
+  <h1>NFC 标签批量写入工具</h1>
+  <p>吉林市博物馆 · 文博智联 · 一次性写入多张展品讲解网址</p>
+</header>
+
+<div class="wrap">
+  <div class="alert warn" id="supportAlert">
+    ⚠️ <b>Web NFC 仅支持 Android 系统的 Chrome 浏览器</b>（需 HTTPS 或 localhost）。<br>
+    iPhone 不支持网页写 NFC，请改用 App「NFC Tools」手动写入。
+  </div>
+
+  <div class="card">
+    <h3>① 设置站点域名</h3>
+    <label>讲解页基础地址（写进标签的网址前缀）</label>
+    <input type="text" id="domain" value="https://jilin-museum.netlify.app/">
+    <p class="note">请确认该地址最后以 <code>/</code> 结尾。点击下方「写入」时会拼成 <code>域名/?id=展品编号</code>。</p>
+  </div>
+
+  <div class="card">
+    <h3>② 逐个写入（写一张贴一张）</h3>
+    <div class="list" id="list"></div>
+  </div>
+
+  <div class="card">
+    <h3>③ 批量写入（按顺序连续写 6 张）</h3>
+    <button class="btn-batch" id="batchBtn">开始批量写入（共 6 张）</button>
+    <p class="note">点击后按顺序写入：先贴近第 1 张标签 → 写入成功自动提示贴下一张，直到全部写完。</p>
+  </div>
+
+  <div class="status" id="status"><b>就绪</b><br>请先确认域名，再选择写入方式。</div>
+</div>
+
+<script>
+const EXHIBITS = [
+  { id:'jilin-meteorite',     name:'吉林一号陨石' },
+  { id:'xituanshan-pottery',  name:'西团山文化猪首石雕' },
+  { id:'fuyu-bronze',         name:'夫余古国文物' },
+  { id:'songhua-fishing',     name:'松花湖浪木与渔猎文化' },
+  { id:'jilin-wula',          name:'明清船厂·打牲乌拉' },
+  { id:'manchu-folk',         name:'满族民俗与服饰' }
+];
+
+const support = ('NDEFReader' in window);
+const supportAlert = document.getElementById('supportAlert');
+const listEl = document.getElementById('list');
+const statusEl = document.getElementById('status');
+const domainInput = document.getElementById('domain');
+const batchBtn = document.getElementById('batchBtn');
+
+function urlOf(id){
+  const d = domainInput.value.trim();
+  return (d.endsWith('/') ? d : d + '/') + '?id=' + id;
+}
+function setStatus(html){ statusEl.innerHTML = html; }
+
+// 初始化列表
+EXHIBITS.forEach((e, i) => {
+  const row = document.createElement('div');
+  row.className = 'row'; row.id = 'row-' + e.id;
+  row.innerHTML = `
+    <div class="info">
+      <div class="name">${i+1}. ${e.name}</div>
+      <div class="url" id="url-${e.id}">${urlOf(e.id)}</div>
+    </div>
+    <span class="done">✔</span>
+    <button class="btn-write" data-id="${e.id}">写入</button>`;
+  listEl.appendChild(row);
+});
+
+domainInput.addEventListener('input', () => {
+  EXHIBITS.forEach(e => { document.getElementById('url-' + e.id).textContent = urlOf(e.id); });
+});
+
+// 单个写入
+listEl.addEventListener('click', async (ev) => {
+  const btn = ev.target.closest('.btn-write');
+  if(!btn) return;
+  const id = btn.dataset.id;
+  if(!support){ alert('当前浏览器不支持 Web NFC，请用 Android Chrome 打开本页。'); return; }
+  await writeOne(id);
+});
+
+async function writeOne(id){
+  const name = EXHIBITS.find(e=>e.id===id).name;
+  const url = urlOf(id);
+  setStatus(`<div class="spinner"></div>正在写入「${name}」<br>请将手机背面贴近 <b>NFC 标签</b>…`);
+  try{
+    const ndef = new NDEFReader();
+    await ndef.write({ records: [{ recordType: 'url', data: url }] });
+    document.getElementById('row-' + id).classList.add('written');
+    setStatus(`✅ <b>${name}</b> 写入成功！<br>网址：<b>${url}</b>`);
+  }catch(err){
+    setStatus(`❌ 写入失败或已取消：<br>${err.message}`);
+  }
+}
+
+// 批量写入
+batchBtn.addEventListener('click', async () => {
+  if(!support){ alert('当前浏览器不支持 Web NFC，请用 Android Chrome 打开本页。'); return; }
+  batchBtn.disabled = true;
+  for(let i=0; i<EXHIBITS.length; i++){
+    const e = EXHIBITS[i];
+    setStatus(`<div class="spinner"></div>批量写入 <b>${i+1}/${EXHIBITS.length}</b>：${e.name}<br>请贴近第 ${i+1} 张 NFC 标签…`);
+    try{
+      const ndef = new NDEFReader();
+      await ndef.write({ records: [{ recordType: 'url', data: urlOf(e.id) }] });
+      document.getElementById('row-' + e.id).classList.add('written');
+    }catch(err){
+      setStatus(`❌ 第 ${i+1} 张「${e.name}」写入失败/取消：${err.message}<br>已停止批量写入。`);
+      batchBtn.disabled = false;
+      return;
+    }
+  }
+  setStatus(`🎉 全部 <b>${EXHIBITS.length}</b> 张标签写入完成！`);
+  batchBtn.disabled = false;
+});
+
+// 能力检测
+if(support){
+  supportAlert.className = 'alert ok';
+  supportAlert.innerHTML = '✅ 当前浏览器支持 Web NFC，可以开始写入标签（请确认已开启手机 NFC 功能）。';
+} else {
+  supportAlert.innerHTML = '⚠️ <b>当前浏览器不支持 Web NFC</b>（仅 Android Chrome 支持）。<br>请用安卓手机 Chrome 打开本页；iPhone 请改用 App「NFC Tools」手动写入。';
+}
+</script>
+</body>
+</html>

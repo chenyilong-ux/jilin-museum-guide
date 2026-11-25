@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>吉林市博物馆 · NFC智慧导览</title>
+<style>
+  :root{
+    --bronze:#8B6F47;
+    --gold:#C9A96A;
+    --gold-light:#E8D5A8;
+    --ink:#3B2F2F;
+    --ink-soft:#6b5b53;
+    --cream:#F7F1E6;
+    --paper:#FDFBF6;
+    --red:#9E2B25;
+    --red-deep:#7c201c;
+    --line:#E4D9C4;
+    --shadow:0 10px 30px rgba(59,47,47,.10);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+    background:var(--paper);color:var(--ink);
+    line-height:1.7;
+  }
+  .serif{font-family:"Songti SC","STSong","SimSun",serif}
+
+  /* 顶部 */
+  header{
+    background:linear-gradient(135deg,#3B2F2F 0%,#5a4638 60%,#7a5c3d 100%);
+    color:#f5ecdc;padding:18px 20px;position:sticky;top:0;z-index:50;
+    box-shadow:0 2px 18px rgba(0,0,0,.25);
+  }
+  .topbar{max-width:1080px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .seal{
+    width:42px;height:42px;border:2px solid var(--gold);border-radius:10px;
+    display:flex;align-items:center;justify-content:center;color:var(--gold);
+    font-family:"Songti SC",serif;font-size:22px;font-weight:700;flex:none;
+  }
+  .brand h1{font-size:19px;font-family:"Songti SC",serif;letter-spacing:1px}
+  .brand p{font-size:11px;color:#cbb995;letter-spacing:2px}
+  .top-actions{display:flex;gap:8px;flex:none}
+  .top-actions button{
+    background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);
+    color:#f0e6d2;padding:7px 12px;border-radius:20px;font-size:12px;cursor:pointer;
+    transition:.2s;
+  }
+  .top-actions button:hover{background:rgba(255,255,255,.22)}
+
+  /* 首屏 */
+  .hero{
+    max-width:1080px;margin:0 auto;padding:40px 20px 28px;text-align:center;
+  }
+  .hero .kicker{
+    display:inline-block;font-size:12px;letter-spacing:4px;color:var(--bronze);
+    border:1px solid var(--bronze);padding:5px 16px;border-radius:20px;margin-bottom:18px;
+  }
+  .hero h2{font-size:clamp(28px,6vw,44px);font-family:"Songti SC",serif;line-height:1.3;margin-bottom:14px}
+  .hero h2 em{font-style:normal;color:var(--red)}
+  .hero p{max-width:660px;margin:0 auto;color:var(--ink-soft);font-size:15px}
+
+  /* NFC 演示 */
+  .nfc-demo{
+    max-width:1080px;margin:0 auto;padding:10px 20px 8px;
+  }
+  .nfc-card{
+    background:linear-gradient(135deg,#fffdf7,#f4ead8);
+    border:1px solid var(--line);border-radius:22px;padding:26px;
+    box-shadow:var(--shadow);
+  }
+  .nfc-card h3{font-family:"Songti SC",serif;font-size:19px;margin-bottom:4px}
+  .nfc-card .sub{font-size:13px;color:var(--ink-soft);margin-bottom:20px}
+  .tap-zone{
+    display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:center;
+    margin-bottom:20px;
+  }
+  .tag{
+    width:150px;height:150px;border-radius:50%;flex:none;
+    background:radial-gradient(circle at 35% 30%,#f7ead2,#e7d3a8 55%,#c9a96a);
+    border:3px solid var(--gold);box-shadow:inset 0 0 0 8px rgba(255,255,255,.35), 0 8px 22px rgba(139,111,71,.35);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    cursor:pointer;transition:.25s;color:var(--ink);
+  }
+  .tag:hover{transform:scale(1.05);box-shadow:0 12px 30px rgba(139,111,71,.5)}
+  .tag:active{transform:scale(.96)}
+  .tag .icon{font-size:34px;line-height:1}
+  .tag .lab{font-size:11px;margin-top:6px;letter-spacing:1px;color:#5a4638;font-weight:600}
+  .ripple{
+    position:relative;overflow:hidden;
+  }
+  .pulse{animation:pulse 2s infinite}
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(201,169,106,.55), inset 0 0 0 8px rgba(255,255,255,.35)}
+    70%{box-shadow:0 0 0 24px rgba(201,169,106,0), inset 0 0 0 8px rgba(255,255,255,.35)}
+    100%{box-shadow:0 0 0 0 rgba(201,169,106,0), inset 0 0 0 8px rgba(255,255,255,.35)}
+  }
+  .url-line{
+    background:#3B2F2F;color:#e8d5a8;border-radius:12px;padding:14px 16px;
+    font-family:"SF Mono",Consolas,monospace;font-size:13px;text-align:center;
+    word-break:break-all;margin-bottom:14px;
+  }
+  .url-line b{color:#fff;font-weight:600}
+  .hint{font-size:12px;color:var(--ink-soft);text-align:center}
+
+  /* 展品网格 */
+  .exhibits{max-width:1080px;margin:0 auto;padding:26px 20px}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:8px}
+  .sec-head h3{font-family:"Songti SC",serif;font-size:22px}
+  .sec-head .cnt{font-size:13px;color:var(--ink-soft)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+  .card{
+    background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;
+    cursor:pointer;transition:.22s;box-shadow:0 4px 14px rgba(59,47,47,.05);
+  }
+  .card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:var(--gold)}
+  .card .thumb{
+    height:130px;display:flex;align-items:center;justify-content:center;
+    font-size:52px;position:relative;
+  }
+  .card .era{
+    position:absolute;top:10px;left:10px;background:rgba(59,47,47,.75);color:#f0e6d2;
+    font-size:11px;padding:3px 10px;border-radius:14px;letter-spacing:1px;
+  }
+  .card .body{padding:14px 16px 16px}
+  .card .body h4{font-family:"Songti SC",serif;font-size:17px;margin-bottom:6px}
+  .card .body p{font-size:13px;color:var(--ink-soft);height:3.9em;overflow:hidden}
+  .card .meta{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+  .card .play{
+    background:var(--red);color:#fff;border:none;border-radius:18px;
+    padding:6px 14px;font-size:12px;cursor:pointer;transition:.2s;
+  }
+  .card .play:hover{background:var(--red-deep)}
+
+  /* 详情弹层 */
+  .modal{
+    position:fixed;inset:0;background:rgba(30,22,18,.55);z-index:100;
+    display:none;align-items:center;justify-content:center;padding:18px;
+  }
+  .modal.show{display:flex}
+  .sheet{
+    background:var(--paper);max-width:640px;width:100%;max-height:88vh;overflow:auto;
+    border-radius:22px;padding:26px;animation:up .28s ease;
+  }
+  @keyframes up{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+  .sheet .close{
+    float:right;background:#efe7d6;border:none;width:32px;height:32px;border-radius:50%;
+    cursor:pointer;font-size:16px;color:var(--ink-soft);
+  }
+  .sheet .big{font-size:44px;margin:6px 0 4px}
+  .sheet h4{font-family:"Songti SC",serif;font-size:24px;margin-bottom:2px}
+  .sheet .era{color:var(--bronze);font-size:13px;letter-spacing:1px;margin-bottom:12px}
+  .sheet .desc{font-size:15px;color:var(--ink);margin-bottom:18px}
+  .sheet .desc p{margin-bottom:10px}
+  .sheet .facts{background:#f4ead8;border-radius:14px;padding:14px 18px;margin-bottom:18px;font-size:13px}
+  .sheet .facts li{margin:6px 0;list-style:none;padding-left:18px;position:relative}
+  .sheet .facts li::before{content:"◆";position:absolute;left:0;color:var(--gold);font-size:11px;top:3px}
+  .audio-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .audio-bar button{
+    border:none;border-radius:24px;padding:11px 20px;font-size:14px;cursor:pointer;transition:.2s;
+  }
+  .btn-main{background:var(--red);color:#fff}
+  .btn-main:hover{background:var(--red-deep)}
+  .btn-ghost{background:#efe7d6;color:var(--ink)}
+  .btn-ghost:hover{background:#e4d7bd}
+  .speaking-dot{width:9px;height:9px;border-radius:50%;background:#7cae5a;display:none}
+  .speaking-dot.on{display:inline-block;animation:blink 1s infinite}
+  @keyframes blink{50%{opacity:.25}}
+
+  footer{
+    text-align:center;padding:34px 20px;color:var(--ink-soft);font-size:12px;
+    border-top:1px solid var(--line);margin-top:10px;
+  }
+  .nfc-note{
+    max-width:1080px;margin:0 auto;padding:0 20px 10px;
+  }
+  .nfc-note details{
+    background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;
+  }
+  .nfc-note summary{cursor:pointer;font-weight:600;font-family:"Songti SC",serif;font-size:16px}
+  .nfc-note .steps{margin-top:14px;font-size:14px}
+  .nfc-note .steps ol{margin-left:20px}
+  .nfc-note .steps li{margin:8px 0}
+  .nfc-note code{background:#f4ead8;padding:2px 7px;border-radius:6px;font-size:13px;color:var(--red-deep)}
+  .lang{display:flex;gap:6px;margin:12px 0 0}
+  .lang button{border:1px solid var(--line);background:#fff;border-radius:14px;padding:4px 12px;font-size:12px;cursor:pointer}
+  .lang button.active{background:var(--bronze);color:#fff;border-color:var(--bronze)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="topbar">
+    <div class="brand">
+      <div class="seal">吉</div>
+      <div>
+        <h1>吉林市博物馆 · 智慧导览</h1>
+        <p>文博智联 · NFC 即触即得</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button id="a11yBtn" title="无障碍模式">无障碍</button>
+      <button id="fontBtn" title="调整字号">A⁺</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="kicker">NFC · 零硬件租借 · 一碰即开</div>
+  <h2>轻触展柜，<em>指尖听史</em></h2>
+  <p>无需下载 APP、无需租借讲解器。用手机轻触展品旁的 NFC 标签，即刻打开本页并自动播放对应文物的语音讲解。</p>
+</section>
+
+<section class="nfc-demo">
+  <div class="nfc-card">
+    <h3>📱 模拟 NFC 触碰</h3>
+    <p class="sub">点击下方标签，模拟手机「一碰」后打开对应展品讲解页（真实场景下为手机自动触发）</p>
+    <div class="tap-zone" id="tapZone"></div>
+    <div class="url-line">NFC 标签内写入的网址：<b id="urlPreview">https://your-domain.com/guide/?id=jilin-meteorite</b></div>
+    <p class="hint">原理：NFC 标签存的是一个网址（NDEF URI），手机读到网址后自动用浏览器打开本页并定位到对应展品。</p>
+  </div>
+</section>
+
+<section class="exhibits">
+  <div class="sec-head">
+    <h3>馆藏精品讲解</h3>
+    <span class="cnt" id="count"></span>
+  </div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<section class="nfc-note">
+  <details>
+    <summary>💡 如何实现「一碰就打开」？（技术说明）</summary>
+    <div class="steps">
+      <ol>
+        <li><b>准备 NFC 标签</b>：购买 NTAG213/215/216 无源标签（约 1–2 元/枚），容量足以写入一个网址。</li>
+        <li><b>写入网址</b>：用手机 App「NFC Tools」或读写器，向标签写入一条 <code>NDEF URI 记录</code>，例如 <code>https://your-domain.com/guide/?id=jilin-meteorite</code>。</li>
+        <li><b>部署网页</b>：把本页部署到服务器（如 GitHub Pages / Vercel / 腾讯云），每个展品对应一个 <code>?id=xxx</code> 参数。</li>
+        <li><b>贴到展柜</b>：将标签贴在文物说明牌旁（建议加铁氧体吸波材料抗金属干扰）。</li>
+        <li><b>游客一碰</b>：Android 手机原生支持，读到网址自动弹窗打开浏览器；iPhone XS 及以上支持「后台 NFC 读取」，无需开 App 即自动跳转。</li>
+      </ol>
+      <p style="margin-top:12px;font-size:13px;color:var(--ink-soft)">补充：如需更沉浸体验，可配合「App Clip（iOS）/ 小程序（微信）」；不支持的机型可用二维码兜底，本页 URL 即二维码内容。</p>
+    </div>
+  </details>
+</section>
+
+<div class="modal" id="modal">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<footer>
+  文博智联 · 以 NFC 技术打开文博服务新空间 &nbsp;|&nbsp; 演示样例：吉林市博物馆<br>
+  本页为前端演示，语音讲解由浏览器 Web Speech API 合成，可无缝替换为后端 TTS/真人录音
+</footer>
+
+<script>
+// ===== 展品数据（可替换为真实数据库）=====
+const LANG = {
+  zh:{play:'▶ 播放讲解', stop:'■ 停止', era:'年代', tap:'轻触', home:'首页'},
+  en:{play:'▶ Play audio', stop:'■ Stop', era:'Period', tap:'Tap', home:'Home'},
+  ja:{play:'▶ 音声再生', stop:'■ 停止', era:'時代', tap:'タップ', home:'ホーム'},
+  ko:{play:'▶ 재생', stop:'■ 정지', era:'시대', tap:'터치', home:'홈'}
+};
+
+const EXHIBITS = [
+  {
+    id:'jilin-meteorite',
+    icon:'☄️', era:'1976年',
+    zh:{name:'吉林一号陨石', desc:'1976年3月8日吉林陨石雨中坠落的最大个体，重1770公斤，是世界已发现的最大石陨石，被誉为"宇宙使者"。'},
+    en:{name:'Jilin No.1 Meteorite', desc:'The largest individual of the Jilin meteorite shower on 8 March 1976. At 1770 kg, it is the largest stony meteorite ever found on Earth.'},
+    facts:['重约 1770 公斤，世界最大石陨石','1976年3月8日陨落于吉林','表面可见熔壳与气印']
+  },
+  {
+    id:'xituanshan-pottery',
+    icon:'🏺', era:'约公元前1000年',
+    zh:{name:'西团山文化双耳陶罐', desc:'西团山文化是吉林地区青铜时代的重要遗存，双耳陶罐造型古朴，反映了先民的生产生活与审美。'},
+    en:{name:'Xituanshan Culture Twin-handle Pottery Jar', desc:'A key Bronze Age culture of the Jilin area. The twin-handle jars are rustic in form, reflecting early settlers\' daily life and aesthetics.'},
+    facts:['西团山文化为吉林青铜时代代表','距今约 3000 年','手制夹砂陶，火候较低']
+  },
+  {
+    id:'fuyu-bronze',
+    icon:'⚔️', era:'公元前2世纪—公元5世纪',
+    zh:{name:'夫余王国青铜器', desc:'夫余是东北地区最早建立的政权之一，其青铜器见证了松花江流域与中原文化的交流与融合。'},
+    en:{name:'Fuyu Kingdom Bronze Ware', desc:'Fuyu was among the earliest polities in Northeast China. Its bronzes testify to cultural exchange along the Songhua River.'},
+    facts:['夫余为东北最早政权之一','活动于松花江中游','青铜器兼具游牧与中原风格']
+  },
+  {
+    id:'songhua-fishing',
+    icon:'🎣', era:'古代—近现代',
+    zh:{name:'松花江渔猎文化', desc:'吉林市依江而建，松花江孕育了独特的渔猎文化，冬捕、渔网、桦皮船等展品诉说着江畔先民的智慧。'},
+    en:{name:'Songhua River Fishing & Hunting Culture', desc:'Jilin City grew by the river. Winter fishing, nets and birch-bark boats tell the wisdom of riverside peoples.'},
+    facts:['松花江孕育渔猎文明','冬捕为重要民俗','桦皮船为特色展品']
+  },
+  {
+    id:'jilin-wula',
+    icon:'⛵', era:'明清时期',
+    zh:{name:'吉林乌拉古城·船厂', desc:'明清时期吉林乌拉是松花江上的重要造船基地与军事重镇，是吉林市城市文脉的源头之一。'},
+    en:{name:'Jilin Ula Ancient City & Shipyard', desc:'A key shipbuilding base and military town on the Songhua River during the Ming-Qing era, the root of Jilin City.'},
+    facts:['明清重要船厂与军事重镇','吉林市城市文脉源头','松花江航运要冲']
+  },
+  {
+    id:'manchu-folk',
+    icon:'🧵', era:'清代—近现代',
+    zh:{name:'满族民俗与服饰', desc:'吉林地区是满族重要聚居地，展出的服饰、刺绣与萨满文化遗存，展现了浓郁的民族风情。'},
+    en:{name:'Manchu Folk Culture & Costume', desc:'A major Manchu settlement area; costumes, embroidery and shamanic relics show rich ethnic heritage.'},
+    facts:['满族重要聚居地','服饰刺绣工艺精湛','萨满文化遗存丰富']
+  }
+];
+
+const curLang = {v:'zh'};
+let speaking = null;
+
+// ===== 工具：URL 参数解析（NFC 一碰后进入的定位逻辑）=====
+function getParam(name){
+  const u = new URLSearchParams(location.search);
+  return u.get(name);
+}
+
+// ===== 语音讲解（Web Speech API）=====
+function speak(text){
+  if(!('speechSynthesis' in window)){ alert('当前浏览器不支持语音合成，请用 Chrome/Edge/Safari。'); return; }
+  if(speaking){ window.speechSynthesis.cancel(); }
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = curLang.v==='zh' ? 'zh-CN' : curLang.v==='en' ? 'en-US' : curLang.v==='ja' ? 'ja-JP' : 'ko-KR';
+  u.rate = 0.92;
+  const voices = window.speechSynthesis.getVoices();
+  const pick = voices.find(v=>v.lang.toLowerCase().startsWith(u.lang));
+  if(pick) u.voice = pick;
+  u.onstart = ()=>setDot(true);
+  u.onend = ()=>setDot(false);
+  u.onerror = ()=>setDot(false);
+  speaking = u;
+  window.speechSynthesis.speak(u);
+}
+function stopSpeak(){
+  if(window.speechSynthesis){ window.speechSynthesis.cancel(); }
+  speaking=null; setDot(false);
+}
+function setDot(on){
+  document.querySelectorAll('.speaking-dot').forEach(d=>d.classList.toggle('on',on));
+}
+
+// ===== 渲染 =====
+function renderTags(){
+  const zone = document.getElementById('tapZone');
+  zone.innerHTML = EXHIBITS.slice(0,5).map(e=>`
+    <div class="tag pulse" data-id="${e.id}" title="模拟触碰：${e.zh.name}">
+      <div class="icon">${e.icon}</div>
+      <div class="lab">${e.zh.name.replace(/吉林|文化|王国|古城|民俗|与服饰/g,'').slice(0,6)||'展品'}</div>
+    </div>`).join('');
+  zone.querySelectorAll('.tag').forEach(t=>{
+    t.addEventListener('click',()=>{ openExhibit(t.dataset.id); updateUrl(t.dataset.id); });
+  });
+}
+function renderGrid(){
+  const grid = document.getElementById('grid');
+  const L = LANG[curLang.v];
+  grid.innerHTML = EXHIBITS.map(e=>{
+    const c = e[curLang.v]||e.zh;
+    return `
+    <div class="card" data-id="${e.id}">
+      <div class="thumb" style="background:${thumbBg(e.id)}">
+        <span class="era">${L.era} ${e.era}</span>${e.icon}
+      </div>
+      <div class="body">
+        <h4>${c.name}</h4>
+        <p>${c.desc}</p>
+        <div class="meta">
+          <button class="play" data-id="${e.id}">${L.play}</button>
+          <span class="speaking-dot"></span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  grid.querySelectorAll('.card').forEach(card=>{
+    card.addEventListener('click',e=>{
+      if(e.target.classList.contains('play')){ openExhibit(card.dataset.id); updateUrl(card.dataset.id); return; }
+      openExhibit(card.dataset.id); updateUrl(card.dataset.id);
+    });
+  });
+  document.getElementById('count').textContent = `共 ${EXHIBITS.length} 件（可扩展）`;
+}
+function thumbBg(id){
+  const map={
+    'jilin-meteorite':'linear-gradient(135deg,#3a3a52,#6b6b8a)',
+    'xituanshan-pottery':'linear-gradient(135deg,#8a5a3a,#c08a5a)',
+    'fuyu-bronze':'linear-gradient(135deg,#3f5a4a,#6f8f74)',
+    'songhua-fishing':'linear-gradient(135deg,#2f5566,#5a8a9a)',
+    'jilin-wula':'linear-gradient(135deg,#5a4638,#8a6f4a)',
+    'manchu-folk':'linear-gradient(135deg,#7a2f3a,#b05a68)'
+  };
+  return map[id]||'linear-gradient(135deg,#5a4638,#8a6f4a)';
+}
+
+// ===== 详情弹层 + 讲解 =====
+function openExhibit(id){
+  const e = EXHIBITS.find(x=>x.id===id);
+  if(!e) return;
+  const c = e[curLang.v]||e.zh;
+  const L = LANG[curLang.v];
+  const sheet = document.getElementById('sheet');
+  sheet.innerHTML = `
+    <button class="close" onclick="closeModal()">✕</button>
+    <div class="big">${e.icon}</div>
+    <h4>${c.name}</h4>
+    <div class="era">${L.era} ${e.era} · NFC ID: ${e.id}</div>
+    <div class="desc"><p>${c.desc}</p></div>
+    <ul class="facts">${e.facts.map(f=>`<li>${f}</li>`).join('')}</ul>
+    <div class="audio-bar">
+      <button class="btn-main" onclick="speakExhibit('${e.id}')">${L.play}</button>
+      <button class="btn-ghost" onclick="stopSpeak()">${L.stop}</button>
+      <span class="speaking-dot"></span>
+    </div>`;
+  document.getElementById('modal').classList.add('show');
+  // 自动讲解
+  speakExhibit(id);
+}
+function speakExhibit(id){
+  const e = EXHIBITS.find(x=>x.id===id);
+  if(!e) return;
+  const c = e[curLang.v]||e.zh;
+  const intro = curLang.v==='zh' ? '欢迎收听吉林市博物馆讲解。' : 'Welcome to the Jilin City Museum audio guide. ';
+  speak(intro + c.name + '。' + c.desc + '。' + e.facts.join('。'));
+}
+function closeModal(){ stopSpeak(); document.getElementById('modal').classList.remove('show'); }
+document.getElementById('modal').addEventListener('click',e=>{ if(e.target.id==='modal') closeModal(); });
+
+// ===== URL 联动（体现 NFC 写入的网址）=====
+function updateUrl(id){
+  const url = `${location.origin}${location.pathname}?id=${id}`;
+  document.getElementById('urlPreview').textContent = url;
+  history.replaceState(null,'',`?id=${id}`);
+}
+
+// ===== 语言切换 =====
+function setLang(lang){
+  curLang.v = lang;
+  document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
+  renderGrid();
+}
+
+// ===== 无障碍 / 字号 =====
+let bigFont = false;
+document.getElementById('fontBtn').addEventListener('click',()=>{
+  bigFont = !bigFont;
+  document.body.style.fontSize = bigFont ? '18px' : '';
+});
+document.getElementById('a11yBtn').addEventListener('click',()=>{
+  document.body.style.filter = document.body.style.filter ? '' : 'contrast(1.12)';
+});
+
+// ===== 语言切换栏 =====
+(function injectLang(){
+  const hero = document.querySelector('.hero');
+  const bar = document.createElement('div');
+  bar.className='lang'; bar.style.justifyContent='center';
+  bar.innerHTML = ['zh','en','ja','ko'].map(l=>`<button data-lang="${l}">${l==='zh'?'中文':l==='en'?'EN':l==='ja'?'日本語':'한국어'}</button>`).join('');
+  hero.appendChild(bar);
+  bar.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+  setLang('zh');
+})();
+
+// ===== 初始化 =====
+renderTags();
+renderGrid();
+
+// 一碰进入：如果 URL 带 ?id=，直接打开对应展品并讲解
+const initId = getParam('id');
+if(initId && EXHIBITS.some(e=>e.id===initId)){
+  updateUrl(initId);
+  setTimeout(()=>openExhibit(initId), 400);
+}
+</script>
+</body>
+</html>
